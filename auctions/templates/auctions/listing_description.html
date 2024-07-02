@@ -1,0 +1,55 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+
+{% if messages %}
+    {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                <div class="alert alert-danger" role="alert">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endif %}
+<h2>{{ listing.name }}</h2>
+{% if listing.image %}
+<img src="{{ listing.image.url }}" alt="{{ listing.name }} Image" style="max-width: 200px;">
+{% endif %}
+<p>Description: {{ listing.desc }}</p>
+<p>Seller: {{listing.seller.username}}</p>
+<p>Current Highest Bid: {{ listing.current_highest_bid }}</p>
+<p>Current Bidder: {{ listing.current_bidder.username }}</p>
+<form method="post" action="{% url 'place_bid' listing.id %}">
+    {% csrf_token %}
+    <label for="bid_amount">Enter Bid Amount:</label>
+    <input type="" id="bid_amount" name="bid_amount">
+    <button type="submit">Place Bid</button>
+</form>
+<br>
+<br>
+{% if comments %}
+    <h3>Comments:</h3>
+    <ul>
+        {% for comment in comments %}
+            <li>{{ comment.comment }}</li>
+            <p>Posted by {{ comment.user.username }} on {{ comment.timestamp }}</p>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No comments yet.</p>
+{% endif %}
+<br>
+<br>
+{% if user.is_authenticated %}
+    <form method="post" action="{% url 'listing_description' listing.id %}">
+        {% csrf_token %}
+        <label for="comment_content">Add a Comment:</label><br>
+        <textarea id="comment_content" name="comment_content" rows="4" cols="50"></textarea><br>
+        <button type="submit">Submit</button>
+    </form>
+{% else %}
+    <p>Please <a href="{% url 'login' %}">login</a> to leave a comment.</p>
+{% endif %}
+{% endblock %}
